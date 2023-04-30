@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus-ingress
+  namespace: monitoring
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - host: "www.myminikube.com"
+      http:
+        paths:
+          - path: /prometheus(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: my-prometheus-server
+                port:
+                  number: 80
+          - path: /alertmanager(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: my-prometheus-alertmanager
+                port:
+                  number: 9093
+          - path: /state-metrics(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: my-prometheus-kube-state-metrics
+                port:
+                  number: 8080
